@@ -28,15 +28,22 @@ public class PersonService {
                 .orElseThrow(() -> new PersonByIdNotFoundException(id));
     }
 
-//    public Person findByName(String name){
-//        return personRepository.getPersonByName(name).
-//                orElseThrow(() -> new PersonByNameNotFoundException(name));
-//    }
-
     public List<Person> findByName(String name){
         if (personRepository.getAllPerson().isEmpty()){
             throw new PersonByNameNotFoundException(name);
         }
         return personRepository.getPersonByName(name);
+    }
+
+    public void addNewPerson(String name, int age){
+        personRepository.insertPerson(name, age);
+    }
+
+    public void updatePersonParam(int id, String name, int age){
+        personRepository.updatePerson(id, name, age);
+    }
+
+    public void deletePerson(int id){
+        personRepository.deletePerson(id);
     }
 }

@@ -8,6 +8,13 @@ import java.util.Optional;
 public interface PersonRepository {
     List<Person> getAllPerson();
     Optional<Person> getPersonById(int id);
-//    Optional<Person> getPersonByName(String name);
+
     List<Person> getPersonByName(String name);
+
+
+    void insertPerson(String name, int age);
+
+    void updatePerson(int id, String name, int age);
+
+    void deletePerson(int id);
 }

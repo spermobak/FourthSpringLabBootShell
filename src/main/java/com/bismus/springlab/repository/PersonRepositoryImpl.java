@@ -2,15 +2,20 @@ package com.bismus.springlab.repository;
 
 import com.bismus.springlab.personMapper.PersonMapper;
 import com.bismus.springlab.model.Person;
+import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@EnableTransactionManagement
+@AllArgsConstructor
 public class PersonRepositoryImpl implements PersonRepository {
+
 
     private static final String SQL_GET_ALL_PERSONS = "Select * from person";
     private static final String SQL_GET_PERSON_BY_ID = "Select * from person where id =:id";
@@ -22,15 +27,9 @@ public class PersonRepositoryImpl implements PersonRepository {
             "Update person set name = :name, age = :age where id = :id";
 
     private static final String SQL_DELETE_PROFILE = "Delete from person where id = :id";
-
-
     private final PersonMapper personMapper;
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public PersonRepositoryImpl(PersonMapper personMapper, NamedParameterJdbcTemplate jdbcTemplate) {
-        this.personMapper = personMapper;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public List<Person> getAllPerson() {

@@ -1,9 +1,9 @@
 package com.bismus.springlab.appMenu;
 
-import com.bismus.springlab.exception.FailedSplitLineException;
 import com.bismus.springlab.service.LanguageService;
 import com.bismus.springlab.service.MessageService;
 import com.bismus.springlab.service.PersonService;
+import com.bismus.springlab.service.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -11,7 +11,6 @@ import org.springframework.shell.standard.ShellMethod;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 
 
 @ShellComponent
@@ -21,7 +20,7 @@ public class AppMenu {
     private final LanguageService languageService;
     private final MessageService messageService;
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final ReaderService readerService;
 
     private ResourceBundle message = ResourceBundle.getBundle("interfaceLanguage", new Locale("en"));
 
@@ -38,7 +37,7 @@ public class AppMenu {
     @ShellMethod("Find person by id")
     public void findById() {
         messageService.printInterfaceMessage(message, "findById");
-        int id = scanner.nextInt();
+        int id = readerService.readID();
 
         if (personService.findById(id) == null) {
             messageService.printInterfaceMessage(message, "notFoundPerson");
@@ -51,7 +50,7 @@ public class AppMenu {
     @ShellMethod("Find person by name")
     public void findByName() {
         messageService.printInterfaceMessage(message, "findByName");
-        var name = scanner.next();
+        var name = readerService.readWord();
 
         if (personService.findByName(name) == null) {
             messageService.printInterfaceMessage(message, "notFoundPerson");
@@ -65,16 +64,15 @@ public class AppMenu {
     public void changeLanguage() {
         messageService.printInterfaceMessage(message, "changeLanguage");
         languageService.printLanguageKey();
-        var lang = scanner.next();
+        var lang = readerService.readWord();
         message = languageService.setInterfaceLanguage(lang, message);
     }
 
     @ShellMethod("Insert new person in database")
     public void insertNewPerson() {
         messageService.printInterfaceMessage(message, "addNewPerson");
-        var line = scanner.nextLine();
 
-        String[] parameters = parameterDistributor(splitLine(line));
+        String[] parameters = readerService.getParameters();
 
         String name = parameters[0];
         int age = Integer.parseInt(parameters[1]);
@@ -86,15 +84,14 @@ public class AppMenu {
     @ShellMethod("Update person parameters")
     public void updatePerson(){
         messageService.printInterfaceMessage(message, "updatePersonParamWriteId");
-        int id = scanner.nextInt();
+        int id = readerService.readID();
 
         if (personService.findById(id) == null) {
             messageService.printInterfaceMessage(message, "notFoundPerson");
         } else {
             messageService.printInterfaceMessage(message, "updatePersonParamWriteNameAge");
-            String line = scanner.nextLine();
 
-            String[] parameters = parameterDistributor(splitLine(line));
+            String[] parameters = readerService.getParameters();
 
             String name = parameters[0];
             int age = Integer.parseInt(parameters[1]);
@@ -107,7 +104,7 @@ public class AppMenu {
     @ShellMethod("Delete person by id")
     public void deletePerson() {
         messageService.printInterfaceMessage(message, "deletePerson");
-        int id = scanner.nextInt();
+        int id = readerService.readID();
 
         if (personService.findById(id) == null) {
             messageService.printInterfaceMessage(message, "notFoundPerson");
@@ -117,32 +114,4 @@ public class AppMenu {
         }
     }
 
-
-
-
-    private static boolean isNumb(String s) throws NumberFormatException {
-        try {
-            Integer.parseInt(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private String[] splitLine(String line){
-        String[] parameters = line.split(" ");
-        if (parameters.length != 2) {
-            throw new FailedSplitLineException();
-        }
-        return parameters;
-    }
-
-    private String[] parameterDistributor(String[] parameters){
-        if (isNumb(parameters[0])){
-            return new String[]{parameters[1],parameters[0]};
-        }else if (isNumb(parameters[1])){
-            return parameters;
-        } else
-            throw new IllegalArgumentException("The entered string cannot be divided into name and age");
-    }
 }
